@@ -10,7 +10,7 @@ public class MapDTO {
 	private int id;
 	private String name;
 	
-	protected MapDTO(int id, String name) {
+	public MapDTO(int id, String name) {
 		this.id = id;
 		this.name = name;
 	}

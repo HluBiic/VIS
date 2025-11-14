@@ -14,8 +14,11 @@ public class DBConnection {
 	
 	private DBConnection() {
 		try {
-			this.con = DriverManager.getConnection("jdbc:h2:./database/r6sDB");
-		} catch (SQLException e) {
+			Class.forName("org.h2.Driver");//for Tomcat
+			//this.con = DriverManager.getConnection("jdbc:h2:file:./database/r6sDB;AUTO_SERVER=TRUE");
+			String dbPath = System.getProperty("DB_PATH", "D:/Users/hlubi/JAVA II/r6matches/database/r6sDB");
+			this.con = DriverManager.getConnection("jdbc:h2:file:" + dbPath + ";AUTO_SERVER=TRUE");
+		} catch (SQLException | ClassNotFoundException e) {
 			throw new RuntimeException("DB connection error: " + e.getMessage());
 		}
 	}

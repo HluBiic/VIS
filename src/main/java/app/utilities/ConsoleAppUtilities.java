@@ -18,11 +18,11 @@ public class ConsoleAppUtilities {
 	}
 	
 	private static void clearConsole() {
-	    System.out.print("\033[H\033[2J");
-	    System.out.flush();
-	    /*for (int i = 0; i < 50; i++) {
+	    //System.out.print("\033[H\033[2J");
+	    //System.out.flush();
+	    for (int i = 0; i < 10; i++) {
 	        System.out.println();
-	    }*/
+	    }
 	}
 	
 	private static void matches() {
@@ -36,6 +36,8 @@ public class ConsoleAppUtilities {
 		System.out.println("[ 2 ] Editovať existujúci zápas");
 		System.out.println("[ 3 ] Vymazať existujúci zápas");
 		System.out.println("[ 4 ] Odhlásiť sa");
+		
+		//System.out.println(MapRepository.findAll());
 		
 		System.out.print("\nProsím zadajte požadovanú voľbu (1 - 4): ");
 		
@@ -86,9 +88,9 @@ public class ConsoleAppUtilities {
         	if (!score.matches("\\d{1,2}-\\d{1,2}")) {
         		validationErrorMessage(4);
         	} else {
-            	MapDTO m = MapRepository.insert(mapName);
-            	System.out.println(MapRepository.findAll());
-            	saveSuccessMessage(m.getId());
+            	//MapDTO m = MapRepository.insert(mapName);
+            	//System.out.println(MapRepository.findAll());
+            	//saveSuccessMessage(m.getId());
         	}
         	break;
         case "n":
@@ -108,11 +110,11 @@ public class ConsoleAppUtilities {
 		System.out.println("=====================================================\n");
 		
 		System.out.println("Aktuálne zápasy:");
-		List<MapDTO> maps = MapRepository.findAll();
+		//List<MapDTO> maps = MapRepository.findAll();
 		
-		for (MapDTO map : maps) {
+		/*for (MapDTO map : maps) {
 			System.out.println("[ " + map.getId() + " ] - " + map.getName());
-		}
+		}*/
 		
 	}
 	

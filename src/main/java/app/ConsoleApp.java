@@ -11,6 +11,7 @@ public class ConsoleApp {
 
 	public static void main(String[] args) {
 		log.info("Launching Console application.");
+		System.out.println("DB path: " + new java.io.File("./database/r6sDB").getAbsolutePath());
 		
 		ConsoleAppUtilities.wellcomeScreen();
 		
