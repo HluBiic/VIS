@@ -6,26 +6,12 @@ import java.util.Scanner;
 
 import dal.repo.MapRepository;
 import dto.MapDTO;
-import dto.MatchDTO;
 import lombok.extern.log4j.Log4j2;
-import services.MapService;
-import services.MatchService;
 
 @Log4j2
 public class ConsoleAppUtilities {	
 	private static Scanner scanner = new Scanner(System.in);
 	private static String caster = "undefined";
-	
-	private static MapService mapService = new MapService();
-	static {
-	    mapService.addListener(Logger.getInstance());
-	}
-	
-	private static MatchService matchService = new MatchService();
-	static {
-	    matchService.addListener(Logger.getInstance());
-	}
-	
 	
 	private static void invalidChoice() {
 		System.out.println("Neplatná voľba. Skúste znova.");
@@ -34,7 +20,7 @@ public class ConsoleAppUtilities {
 	private static void clearConsole() {
 	    //System.out.print("\033[H\033[2J");
 	    //System.out.flush();
-	    for (int i = 0; i < 20; i++) {
+	    for (int i = 0; i < 10; i++) {
 	        System.out.println();
 	    }
 	}
@@ -50,6 +36,8 @@ public class ConsoleAppUtilities {
 		System.out.println("[ 2 ] Editovať existujúci zápas");
 		System.out.println("[ 3 ] Vymazať existujúci zápas");
 		System.out.println("[ 4 ] Odhlásiť sa");
+		
+		//System.out.println(MapRepository.findAll());
 		
 		System.out.print("\nProsím zadajte požadovanú voľbu (1 - 4): ");
 		
@@ -88,7 +76,7 @@ public class ConsoleAppUtilities {
 		
 		System.out.print("\n* 4. Zadajte skóre: ");
 		String score = scanner.nextLine().trim();
-		System.out.print("\n* 5. Zadajte nazov mapy: ");
+		System.out.print("\n* 5. Zadajte mapu: ");
 		String mapName = scanner.nextLine().trim();
 		
 		
@@ -97,18 +85,12 @@ public class ConsoleAppUtilities {
         
         switch (choice) {
         case "y":
-        	
-        	String mapNameValidationResult = Validator.validateMapName(mapName);
-        	String matchScoreValidationResult = Validator.validateMatchScore(score);
-        	
-        	if (matchScoreValidationResult != null) {
-        		validationErrorMessage(4, matchScoreValidationResult);
-        	} else if (mapNameValidationResult != null) {
-        		validationErrorMessage(5, mapNameValidationResult);
+        	if (!score.matches("\\d{1,2}-\\d{1,2}")) {
+        		validationErrorMessage(4);
         	} else {
-        		MatchDTO m = matchService.newMatch(1, score, caster);
-        		System.out.println(matchService.getAllMatches());
-        		saveSuccessMessage(m.getId());
+            	//MapDTO m = MapRepository.insert(mapName);
+            	//System.out.println(MapRepository.findAll());
+            	//saveSuccessMessage(m.getId());
         	}
         	break;
         case "n":
@@ -128,31 +110,11 @@ public class ConsoleAppUtilities {
 		System.out.println("=====================================================\n");
 		
 		System.out.println("Aktuálne zápasy:");
-		//List<MapDTO> maps = mapService.getAllMaps();
-		//for (MapDTO map : maps) {
-		//	System.out.println("[ " + map.getId() + " ] - " + map.getName());
-		//}
-		List<MatchDTO> matches = matchService.getAllMatches();
-		for (MatchDTO match : matches) {
-			// TODO mapService get map by id a dostaneme sa k menu mapy pre vypis
-			//System.out.println("[ " + match.getId() + " ] - map: " + match.getMap());
-			System.out.println(matchService.getMatchInfo(match.getId()));
-		}
-
+		//List<MapDTO> maps = MapRepository.findAll();
 		
-		System.out.print("\nNávrat do hlavného menu [y/n]: ");
-		String choice = scanner.nextLine().trim();
-        
-        switch (choice) {
-        case "y":
-        	matches(); //return to main menu
-        case "n":
-        	editExistingMatch();
-        	break;
-        default:
-        	invalidChoice();
-        	break;
-        }
+		/*for (MapDTO map : maps) {
+			System.out.println("[ " + map.getId() + " ] - " + map.getName());
+		}*/
 		
 	}
 	
@@ -196,7 +158,7 @@ public class ConsoleAppUtilities {
 	
 	//TODO dokoncit osetrovacky pre zvysne parametre
 	//line predstavuje cislo riadku v ktorom bol chybny parameter
-	private static void validationErrorMessage(int line, String errorMessage) {
+	private static void validationErrorMessage(int line) {
 		clearConsole();
 		System.out.println("\n=====================================================");
 		System.out.println("                  CHYBA VALIDÁCIE");
@@ -210,12 +172,10 @@ public class ConsoleAppUtilities {
 			case 3:
 				break;
 			case 4:
-				System.out.println(errorMessage);
+				System.out.println("Neplatný formát skóre. Skóre musí byť v tvare M-N (napr. 7-5 alebo 8-7).");
 				System.out.println("Chyba nájdená v poli: Skóre.");
 				break;
 			case 5:
-				System.out.println(errorMessage);
-				System.out.println("Chyba nájdená v poli: Názov mapy.");
 				break;
 		}
 		
