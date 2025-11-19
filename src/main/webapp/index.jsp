@@ -52,12 +52,14 @@
   <div class="container my-4">
     <!-- Top header -->
     <div class="header-top">
-      <!-- R6 Icon on the left -->
-      <img
-        class="icon"
-        src="https://images.seeklogo.com/logo-png/32/2/rainbow-six-siege-logo-png_seeklogo-325646.png"
-        alt="R6 Icon"
-      />
+      <!-- R6 Icon on the left + redirection to index -->
+		<a href="index">
+		  <img
+		    class="icon"
+		    src="https://images.seeklogo.com/logo-png/32/2/rainbow-six-siege-logo-png_seeklogo-325646.png"
+		    alt="R6 Icon"
+		  />
+		</a>
       <!-- Title -->
       <h2>R6 Tournaments Hub</h2>
       <!-- Dark mode switch on the right -->
@@ -93,9 +95,7 @@
             <th>ID</th>
             <th>Name</th>
             <th>Year</th>
-            <th>Map</th>
-            <th>League</th>
-            <th>Winner</th>
+            <th>Location</th>
           </tr>
         </thead>
         <tbody>
@@ -104,10 +104,8 @@
             <td><a href="maps" class="text-decoration-none text-primary">
 		        Six Invitational
 		     </a></td>
-            <td>2023</td>
-            <td>Bank</td>
-            <td>EUL</td>
-            <td>G2</td>
+            <td>2025-10-16</td>
+            <td>Canada</td>
           </tr>
         </tbody>
       </table>

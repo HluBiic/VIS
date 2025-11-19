@@ -11,16 +11,12 @@ import model.Map;
 public class Mapper {
 
 	private static final MapRepository mapRepo = new MapRepository();
-	
-	/*public Mapper(/*MapRepository mapRepo) {
-		/*this.mapRepo = mapRepo;
-	}*/
+
 	
 	//Domain -> DTO
 	public static MatchDTO toDto(Match m) {
 		return AllDTOFactory.createMatch(m.getId(), m.getMap().getId(), m.getScore());
 	}
-	
 	
 	//DTO -> Domain
 	public static Match toDomain(MatchDTO m) {

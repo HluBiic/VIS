@@ -10,6 +10,21 @@ public class MapRepository {
 
 	private MapGateway mapGateway = new MapGateway();
 	
+	public void init() {
+		if (findByName("Bank") == null) {
+			mapGateway.insert("Bank");
+		}
+		if (findByName("Favela") == null) {
+			mapGateway.insert("Favela");
+		}
+		if (findByName("Chalet") == null) {
+			mapGateway.insert("Chalet");
+		}
+		if (findByName("Oregon") == null) {
+			mapGateway.insert("Oregon");
+		}
+	}
+	
 	public MapDTO insert(String name) {
 		return mapGateway.insert(name);
 	}
@@ -39,5 +54,15 @@ public class MapRepository {
 			}
 		}
 		return results;
+	}
+	
+	public MapDTO findByName(String name) {
+		List <MapDTO> maps = mapGateway.findAll();
+		for (MapDTO m : maps) {
+			if (m.getName().equals(name)) {
+				return m;
+			}
+		}
+		return null;
 	}
 }

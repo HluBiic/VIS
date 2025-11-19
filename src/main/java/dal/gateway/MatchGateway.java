@@ -28,7 +28,7 @@ public class MatchGateway {
 					+ "map INT NOT NULL,"
 					+ "score VARCHAR(50) NOT NULL)");
 			s.close();
-			log.info("Matches table created.");
+			//log.info("Matches table created.");
 		} catch (SQLException e) {
 			throw new RuntimeException ("Table nitialization failed: " + e.getMessage());
 		}
@@ -99,13 +99,39 @@ public class MatchGateway {
 	
 	//U from CRUD
 	public MatchDTO update(MatchDTO match) {
-		//TODO
+		String sql = "UPDATE matches SET map = ?, score = ? WHRE id = ?";
+		try (PreparedStatement ps = this.con.prepareStatement(sql)) {
+			ps.setInt(1, match.getMap());
+			ps.setString(2, match.getScore());
+			
+			int affectedRows = ps.executeUpdate();
+			
+			if (affectedRows > 0) {
+				log.info("Match [" + match.getId() + "] updated in DB");
+				return AllDTOFactory.createMatch(match.getId(), match.getMap(), match.getScore());
+			}
+		} catch (SQLException e) {
+			log.error("Update failed: " + e.getMessage());
+		}
 		return null;
 	}
 	
 	//D from CRUD
 	public MatchDTO delete(int id) {
-		//TODO
+		MatchDTO m = this.findById(id);
+		String sql = "DELETE FROM matches WHERE id = ?";
+		try(PreparedStatement ps = this.con.prepareStatement(sql)) {
+			ps.setInt(1, id);
+			
+			int affectedRows = ps.executeUpdate();
+			
+			if (affectedRows > 0) {
+				log.info("Match [" + m.getId() + "] deleted in DB");
+				return AllDTOFactory.createMatch(m.getId(), m.getMap(), m.getScore());
+			}
+		} catch (SQLException e) {
+			log.error("Delete failed: " + e.getMessage());
+		}
 		return null;
 	}
 }

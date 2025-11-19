@@ -1,5 +1,6 @@
 package dal.repo;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import dal.gateway.MatchGateway;
@@ -14,17 +15,14 @@ public class MatchRepository {
 	}
 	
 	public MatchDTO update(MatchDTO match) {
-		//TODO
-		return null;
+		return matchGateway.update(match);
 	}
 	
 	public MatchDTO delete(int id) {
-		//TODO
-		return null;
+		return matchGateway.delete(id);
 	}
 	
 	public MatchDTO findById(int id) {
-		//TODO
 		return matchGateway.findById(id);
 	}
 	
@@ -33,7 +31,13 @@ public class MatchRepository {
 	}
 	
 	public List<MatchDTO> findByIds(List<Integer> ids) {
-		//TODO
-		return null;
+		List<MatchDTO> results = new ArrayList<MatchDTO>();
+		for (Integer id : ids) {
+			MatchDTO m = matchGateway.findById(id);
+			if (m != null) {
+				results.add(m);
+			}
+		}
+		return results;
 	}
 }

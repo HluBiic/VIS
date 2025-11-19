@@ -27,7 +27,7 @@ public class MapGateway {
 					+ "id INT AUTO_INCREMENT PRIMARY KEY,"
 					+ "name VARCHAR(50))");
 			s.close();
-			log.info("Map table created.");
+			//log.info("Map table created.");
 		} catch (SQLException e) {
 			throw new RuntimeException ("Table nitialization failed: " + e.getMessage());
 		}
@@ -62,7 +62,7 @@ public class MapGateway {
 			
 			try (ResultSet rs = ps.executeQuery()) {
 				if (rs.next()) {
-					return AllDTOFactory.loadMap(
+					return AllDTOFactory.createMap(
 							rs.getInt("id"),
 							rs.getString("name"));
 				}
@@ -82,7 +82,7 @@ public class MapGateway {
 			 ResultSet rs = s.executeQuery(sql)) {
 			
 			while (rs.next()) {
-				maps.add(AllDTOFactory.loadMap(
+				maps.add(AllDTOFactory.createMap(
 						rs.getInt("id"), 
 						rs.getString("name")
 				));
@@ -104,7 +104,7 @@ public class MapGateway {
 	        
 	        if (affectedRows > 0) {
 	        	log.info("Map [" + map.getId() + "] - " + map.getName() + " updated in DB.");
-	            return AllDTOFactory.loadMap(map.getId(), map.getName());
+	            return AllDTOFactory.createMap(map.getId(), map.getName());
 	        }
 		} catch (SQLException e) {
 			log.error("Update failed: " + e.getMessage());
@@ -123,7 +123,7 @@ public class MapGateway {
 			
 	        if (affectedRows > 0) {
 	        	log.info("Map [" + m.getId() + "] - " + m.getName() + " deleted from DB.");
-	            return AllDTOFactory.loadMap(m.getId(), m.getName());
+	            return AllDTOFactory.createMap(m.getId(), m.getName());
 	        }
 		} catch (SQLException e) {
 			log.error("Delete failed: " + e.getMessage());

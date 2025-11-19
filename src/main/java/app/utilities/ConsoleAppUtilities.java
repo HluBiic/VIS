@@ -4,14 +4,32 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Scanner;
 
+import dal.UnitOfWork;
 import dal.repo.MapRepository;
 import dto.MapDTO;
+import dto.MatchDTO;
 import lombok.extern.log4j.Log4j2;
+import model.Map;
+import model.Match;
+import services.MapService;
+import services.MatchService;
 
 @Log4j2
 public class ConsoleAppUtilities {	
 	private static Scanner scanner = new Scanner(System.in);
 	private static String caster = "undefined";
+	public static UnitOfWork uow;
+	
+	private static MapService mapService = new MapService();
+	static {
+	    mapService.addListener(Logger.getInstance());
+	}
+	
+	private static MatchService matchService = new MatchService();
+	static {
+	    matchService.addListener(Logger.getInstance());
+	}
+	
 	
 	private static void invalidChoice() {
 		System.out.println("Neplatná voľba. Skúste znova.");
@@ -20,12 +38,13 @@ public class ConsoleAppUtilities {
 	private static void clearConsole() {
 	    //System.out.print("\033[H\033[2J");
 	    //System.out.flush();
-	    for (int i = 0; i < 10; i++) {
+	    for (int i = 0; i < 30; i++) {
 	        System.out.println();
 	    }
 	}
 	
 	private static void matches() {
+		mapService.initMaps(); //vlozi vsetke mapy do DB ak tam este niesu
 		clearConsole();
 		System.out.println("\n=====================================================");
 		System.out.println("        Správa zápasov - Prihlásený: " + caster);
@@ -36,8 +55,6 @@ public class ConsoleAppUtilities {
 		System.out.println("[ 2 ] Editovať existujúci zápas");
 		System.out.println("[ 3 ] Vymazať existujúci zápas");
 		System.out.println("[ 4 ] Odhlásiť sa");
-		
-		//System.out.println(MapRepository.findAll());
 		
 		System.out.print("\nProsím zadajte požadovanú voľbu (1 - 4): ");
 		
@@ -76,7 +93,7 @@ public class ConsoleAppUtilities {
 		
 		System.out.print("\n* 4. Zadajte skóre: ");
 		String score = scanner.nextLine().trim();
-		System.out.print("\n* 5. Zadajte mapu: ");
+		System.out.print("\n* 5. Zadajte nazov mapy: ");
 		String mapName = scanner.nextLine().trim();
 		
 		
@@ -85,16 +102,25 @@ public class ConsoleAppUtilities {
         
         switch (choice) {
         case "y":
-        	if (!score.matches("\\d{1,2}-\\d{1,2}")) {
-        		validationErrorMessage(4);
+        	
+        	String mapNameValidationResult = Validator.validateMapName(mapName);
+        	String matchScoreValidationResult = Validator.validateMatchScore(score);
+        	
+        	if (matchScoreValidationResult != null) {
+        		validationErrorMessage(4, matchScoreValidationResult);
+        	} else if (mapNameValidationResult != null) {
+        		validationErrorMessage(5, mapNameValidationResult);
         	} else {
-            	//MapDTO m = MapRepository.insert(mapName);
-            	//System.out.println(MapRepository.findAll());
-            	//saveSuccessMessage(m.getId());
+        		//MapDTO map = mapService.getMapByName(mapName);
+        		Map map = mapService.getMapByName(mapName);
+        		//MatchDTO m = matchService.newMatch(map.getId(), score, caster);
+        		Match m = matchService.newMatch(map.getId(), score, caster);
+        		System.out.println(matchService.getAllMatches());
+        		saveSuccessMessage(m.getId());
         	}
         	break;
         case "n":
-        	newMatchForm();
+        	matches();
         	break;
         default:
         	invalidChoice();
@@ -110,11 +136,29 @@ public class ConsoleAppUtilities {
 		System.out.println("=====================================================\n");
 		
 		System.out.println("Aktuálne zápasy:");
-		//List<MapDTO> maps = MapRepository.findAll();
+		//List<MapDTO> maps = mapService.getAllMaps();
+		//for (MapDTO map : maps) {
+		//	System.out.println("[ " + map.getId() + " ] - " + map.getName());
+		//}
+		List<Match> matches = matchService.getAllMatches();
+		for (Match match : matches) {
+			System.out.println(matchService.getMatchInfo(match.getId()));
+		}
+
 		
-		/*for (MapDTO map : maps) {
-			System.out.println("[ " + map.getId() + " ] - " + map.getName());
-		}*/
+		System.out.print("\nNávrat do hlavného menu [y/n]: ");
+		String choice = scanner.nextLine().trim();
+        
+        switch (choice) {
+        case "y":
+        	matches(); //return to main menu
+        case "n":
+        	editExistingMatch();
+        	break;
+        default:
+        	invalidChoice();
+        	break;
+        }
 		
 	}
 	
@@ -158,7 +202,7 @@ public class ConsoleAppUtilities {
 	
 	//TODO dokoncit osetrovacky pre zvysne parametre
 	//line predstavuje cislo riadku v ktorom bol chybny parameter
-	private static void validationErrorMessage(int line) {
+	private static void validationErrorMessage(int line, String errorMessage) {
 		clearConsole();
 		System.out.println("\n=====================================================");
 		System.out.println("                  CHYBA VALIDÁCIE");
@@ -172,10 +216,12 @@ public class ConsoleAppUtilities {
 			case 3:
 				break;
 			case 4:
-				System.out.println("Neplatný formát skóre. Skóre musí byť v tvare M-N (napr. 7-5 alebo 8-7).");
+				System.out.println(errorMessage);
 				System.out.println("Chyba nájdená v poli: Skóre.");
 				break;
 			case 5:
+				System.out.println(errorMessage);
+				System.out.println("Chyba nájdená v poli: Názov mapy.");
 				break;
 		}
 		
@@ -282,6 +328,7 @@ public class ConsoleAppUtilities {
 		System.out.println("                       KONIEC");
 		System.out.println("=====================================================\n");
 		log.info("Closing Console application.");
+		ConsoleAppUtilities.uow.end();
 		System.exit(0);
 	}
 }
