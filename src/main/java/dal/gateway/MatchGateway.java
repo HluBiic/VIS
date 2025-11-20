@@ -25,6 +25,9 @@ public class MatchGateway {
 			Statement s = con.createStatement();
 			s.execute("CREATE TABLE IF NOT EXISTS matches ("
 					+ "id INT AUTO_INCREMENT PRIMARY KEY,"
+					+ "tour INT NOT NULL,"
+					+ "teamA INT NOT NULL,"
+					+ "teamB INT NOT NULL,"
 					+ "map INT NOT NULL,"
 					+ "score VARCHAR(50) NOT NULL)");
 			s.close();
@@ -35,19 +38,22 @@ public class MatchGateway {
 	}
 	
 	//C from CRUD
-	public MatchDTO insert(int mapID, String score) {
+	public MatchDTO insert(int tourID, int teamAId, int teamBId, int mapID, String score) {
 		try (PreparedStatement ps = this.con.prepareStatement(
-				"INSERT INTO matches (map, score) VALUES (?, ?)", Statement.RETURN_GENERATED_KEYS)) {
+				"INSERT INTO matches (tour, teamA, teamB, map, score) VALUES (?, ?, ?, ?, ?)", Statement.RETURN_GENERATED_KEYS)) {
 			
-			ps.setInt(1, mapID);
-			ps.setString(2, score);
+			ps.setInt(1, tourID);
+			ps.setInt(2, teamAId);
+			ps.setInt(3, teamBId);
+			ps.setInt(4, mapID);
+			ps.setString(5, score);
 			ps.executeUpdate();
 			
 			ResultSet rs = ps.getGeneratedKeys();
 			if (rs.next()) {
 				int generatedID = rs.getInt(1);
 				log.info("Match [" + generatedID + "] inserted into DB.");
-				return AllDTOFactory.createMatch(generatedID, mapID, score);
+				return AllDTOFactory.createMatch(generatedID, tourID, teamAId, teamBId, mapID, score);
 			}
 			
 		} catch (SQLException e) {
@@ -65,7 +71,10 @@ public class MatchGateway {
 			try (ResultSet rs = ps.executeQuery()) {
 				if (rs.next()) {
 					return AllDTOFactory.createMatch(
-							rs.getInt("id"), 
+							rs.getInt("id"),
+							rs.getInt("tour"),
+							rs.getInt("teamA"),
+							rs.getInt("teamB"),
 							rs.getInt("map"), 
 							rs.getString("score"));
 				}
@@ -86,7 +95,10 @@ public class MatchGateway {
 				
 				while (rs.next()) {
 					matches.add(AllDTOFactory.createMatch(
-							rs.getInt("id"), 
+							rs.getInt("id"),
+							rs.getInt("tour"),
+							rs.getInt("teamA"),
+							rs.getInt("teamB"),
 							rs.getInt("map"), 
 							rs.getString("score")
 					));
@@ -99,16 +111,20 @@ public class MatchGateway {
 	
 	//U from CRUD
 	public MatchDTO update(MatchDTO match) {
-		String sql = "UPDATE matches SET map = ?, score = ? WHRE id = ?";
+		String sql = "UPDATE matches SET tour = ?, teamA = ?, teamB = ?, map = ?, score = ? WHERE id = ?";
 		try (PreparedStatement ps = this.con.prepareStatement(sql)) {
-			ps.setInt(1, match.getMap());
-			ps.setString(2, match.getScore());
+			ps.setInt(1, match.getTournament());
+			ps.setInt(2, match.getTeamA());
+			ps.setInt(3, match.getTeamB());
+			ps.setInt(4, match.getMap());
+			ps.setString(5, match.getScore());
+			ps.setInt(6, match.getId());
 			
 			int affectedRows = ps.executeUpdate();
 			
 			if (affectedRows > 0) {
 				log.info("Match [" + match.getId() + "] updated in DB");
-				return AllDTOFactory.createMatch(match.getId(), match.getMap(), match.getScore());
+				return AllDTOFactory.createMatch(match.getId(), match.getTournament(), match.getTeamA(), match.getTeamB(), match.getMap(), match.getScore());
 			}
 		} catch (SQLException e) {
 			log.error("Update failed: " + e.getMessage());
@@ -127,7 +143,7 @@ public class MatchGateway {
 			
 			if (affectedRows > 0) {
 				log.info("Match [" + m.getId() + "] deleted in DB");
-				return AllDTOFactory.createMatch(m.getId(), m.getMap(), m.getScore());
+				return AllDTOFactory.createMatch(m.getId(), m.getTournament(), m.getTeamA(), m.getTeamB(), m.getMap(), m.getScore());
 			}
 		} catch (SQLException e) {
 			log.error("Delete failed: " + e.getMessage());

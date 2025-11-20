@@ -9,6 +9,9 @@ import lombok.Setter;
 @AllArgsConstructor
 public class Match {
     private int id;
+    private Tournament tournament;
+    private Team teamA;
+    private Team teamB;
     private Map map;//domain model contains the real object and not just its id as in DTO
     private String score;
 }

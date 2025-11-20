@@ -1,6 +1,8 @@
 <%@page import="model.Match"%>
 <%@ page import="java.util.List" %>
 <%@ page import="model.Map" %>
+<%@ page import="model.Tournament" %>
+<%@ page import="model.Team" %>
 
 <!DOCTYPE html>
 <html lang="en">
@@ -153,7 +155,8 @@
 			<table class="table table-bordered table-striped text-white" id="mapsTable">
 			    <thead>
 			        <tr>
-			            <th>Match ID</th>
+			            <th>ID</th>
+			            <th>Tournament</th>
 			            <th>Teams</th>
 			            <th>Map</th>
 			            <th>Score</th>
@@ -174,7 +177,8 @@
 				    %>
 				    <tr>
 				        <td><%= m.getId() %></td>
-				        <td> TODO </td>
+				        <td><%= m.getTournament().getName() %></td>
+				        <td><%= m.getTeamA().getName() %> vs <%= m.getTeamB().getName() %> </td>
 				        <td><%= m.getScore() %></td>
 				        <td><%= map != null ? map.getName() : "Unknown Map" %></td>
 				    </tr>
@@ -188,6 +192,7 @@
 			<table class="table table-bordered table-striped text-white" id="mapsTable">
 			    <thead>
 			        <tr>
+			        	<th>ID</th>
 			            <th>Map Name</th>
 			        </tr>
 			    </thead>
@@ -197,14 +202,65 @@
 			            for (Map map : maps2) {
 			        %>
 			        <tr>
-			            <td><%= map.getName() %></td>
-
+			            <td><%= map.getId() %></td>
+						<td><%= map.getName() %></td>
 			        </tr>
 			        <%
 			            }
 			        %>
 			    </tbody>
-			</table>            
+			</table>
+			
+			<h2>TOURNAMENTS FROM DB</h2>
+			<table class="table table-bordered table-striped text-white" id="mapsTable">
+			    <thead>
+			        <tr>
+			            <th>ID</th>
+			            <th>Name</th>
+			            <th>Location</th>
+			            <th>Date</th>
+			        </tr>
+			    </thead>
+			    <tbody>
+			        <%
+			            List<Tournament> tours = (List<Tournament>) request.getAttribute("tournaments");
+			            for (Tournament t : tours) {
+			        %>
+			        <tr>
+			            <td><%= t.getId() %></td>
+						<td><%= t.getName() %></td>
+						<td><%= t.getLocation() %></td>
+						<td><%= t.getDate() %></td>
+			        </tr>
+			        <%
+			            }
+			        %>
+			    </tbody>
+			</table>
+			<h2>TEAMS FROM DB</h2>
+			<table class="table table-bordered table-striped text-white" id="mapsTable">
+			    <thead>
+			        <tr>
+			        	<th>ID</th>
+			            <th>Team Name</th>
+			            <th>Region</th>
+			        </tr>
+			    </thead>
+			    <tbody>
+			        <%
+			            List<Team> teams = (List<Team>) request.getAttribute("teams");
+			            for (Team team : teams) {
+			        %>
+			        <tr>
+			        	<td><%= team.getId() %></td>
+			            <td><%= team.getName() %></td>
+						<td><%= team.getRegion() %></td>
+			        </tr>
+			        <%
+			            }
+			        %>
+			    </tbody>
+			</table>        
           </div>
         </div>
       </div>

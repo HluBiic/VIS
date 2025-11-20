@@ -16,24 +16,11 @@ import model.Map;
 public class MapService {
 
 	private final MapRepository mapRepo = new MapRepository();
-	private final List<Listener> listeners = new ArrayList<>();
 	
 	//will only insert the map if it doesnt already exist in DB
 	public void initMaps() {
 		mapRepo.init();
 	}
-	
-	public void addListener(Listener l) {
-		listeners.add(l);
-	}
-	
-	/*public Map newMap(String name, String caster) {
-		Map map = Mapper.toDomain(mapRepo.insert(name));
-		for (Listener l : listeners) {
-			l.onCreated(map.getId(), EntityKind.MAP, caster);
-		}
-		return map;
-	}*/
 	
 	public Map newMap(String name, String caster) {
 		UnitOfWork uow = new UnitOfWork();
@@ -42,12 +29,7 @@ public class MapService {
 			MapDTO dto = AllDTOFactory.createMap(0, name);
 			uow.registerNew(dto);
 			uow.commit();
-			Map m = Mapper.toDomain(dto);
-			
-			for (Listener l : listeners) {
-				l.onCreated(m.getId(), EntityKind.MAP, caster);
-			}
-			//uow.end();
+			Map m = Mapper.toDomain(dto);			
 			return m;
 		} catch (Exception e) {
 			throw new RuntimeException("Map creation failed: " + e.getMessage());

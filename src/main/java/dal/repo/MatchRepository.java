@@ -10,8 +10,8 @@ public class MatchRepository {
 
 	private MatchGateway matchGateway = new MatchGateway();
 	
-	public MatchDTO insert(int mapId, String score) {
-		return matchGateway.insert(mapId, score);
+	public MatchDTO insert(int tourId, int teamAid, int teamBid, int mapId, String score) {
+		return matchGateway.insert(tourId, teamAid, teamBid, mapId, score);
 	}
 	
 	public MatchDTO update(MatchDTO match) {
@@ -40,4 +40,16 @@ public class MatchRepository {
 		}
 		return results;
 	}
+	
+	//TODO - treba vylistovat vsetke zapasy daneho turnaja
+	/*public List<MatchDTO> findMatchesByTournament(int tournament) {
+		List<MatchDTO> matches = matchGateway.findAll();
+		List<MatchDTO> result = new ArrayList<>();
+		for(MatchDTO m : matches) {
+			if (m.getTournament() == tournament) {
+				result.add(m);
+			}
+		}
+		return result;
+	}*/
 }

@@ -88,12 +88,11 @@ public class UnitOfWork {
 			}
 		}
 		
-		//TODO opravit ked pridu ostatne atributy do zapasu
 		if (this.newEntities.containsKey(EntityKind.MATCH)) {
 			List<Object> list = this.newEntities.get(EntityKind.MATCH);
 			for (int i = 0; i < list.size(); i++) {
 				MatchDTO m = (MatchDTO) list.get(i);
-				MatchDTO inserted = this.matchRepo.insert(m.getMap(), m.getScore());
+				MatchDTO inserted = this.matchRepo.insert(m.getTournament(), m.getTeamA(), m.getTeamB(), m.getMap(), m.getScore());
 				//list.set(i, inserted);
 				m.setId(inserted.getId());
 			}

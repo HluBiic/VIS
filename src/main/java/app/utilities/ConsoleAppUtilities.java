@@ -11,8 +11,12 @@ import dto.MatchDTO;
 import lombok.extern.log4j.Log4j2;
 import model.Map;
 import model.Match;
+import model.Team;
+import model.Tournament;
 import services.MapService;
 import services.MatchService;
+import services.TeamService;
+import services.TournamentService;
 
 @Log4j2
 public class ConsoleAppUtilities {	
@@ -20,16 +24,14 @@ public class ConsoleAppUtilities {
 	private static String caster = "undefined";
 	public static UnitOfWork uow;
 	
-	private static MapService mapService = new MapService();
-	static {
-	    mapService.addListener(Logger.getInstance());
-	}
-	
 	private static MatchService matchService = new MatchService();
 	static {
 	    matchService.addListener(Logger.getInstance());
 	}
 	
+	private static TournamentService tourService = new TournamentService();
+	private static MapService mapService = new MapService();
+	private static TeamService teamService = new TeamService();
 	
 	private static void invalidChoice() {
 		System.out.println("Neplatná voľba. Skúste znova.");
@@ -45,6 +47,9 @@ public class ConsoleAppUtilities {
 	
 	private static void matches() {
 		mapService.initMaps(); //vlozi vsetke mapy do DB ak tam este niesu
+		tourService.initTournaments();
+		teamService.initTeams();
+		
 		clearConsole();
 		System.out.println("\n=====================================================");
 		System.out.println("        Správa zápasov - Prihlásený: " + caster);
@@ -91,9 +96,15 @@ public class ConsoleAppUtilities {
 		System.out.println("- Povinné polia sú označené hviezdičkou (*).");
 		System.out.println("- Skóre musí byť vo formáte M-N (napr. 7-5).");
 		
+		System.out.print("\n* 1. Zadajte turnaj: ");
+		String tourName = scanner.nextLine().trim();
+		System.out.print("\n* 2. Zadajte tím A: ");
+		String teamAName = scanner.nextLine().trim();
+		System.out.print("\n* 3. Zadajte tím B: ");
+		String teamBName = scanner.nextLine().trim();
 		System.out.print("\n* 4. Zadajte skóre: ");
 		String score = scanner.nextLine().trim();
-		System.out.print("\n* 5. Zadajte nazov mapy: ");
+		System.out.print("\n* 5. Zadajte názov mapy: ");
 		String mapName = scanner.nextLine().trim();
 		
 		
@@ -102,19 +113,32 @@ public class ConsoleAppUtilities {
         
         switch (choice) {
         case "y":
-        	
+        	String tourNameValidationResult = Validator.validateTournamentName(tourName);
+        	String teamANameValidationResult = Validator.validateTeamAName(teamAName);
+        	String teamBNameValidationResult = Validator.validateTeamBName(teamBName);
+        	String teamVsTeamValidationResult = Validator.validateTeamVsTeam(teamAName, teamBName);
         	String mapNameValidationResult = Validator.validateMapName(mapName);
         	String matchScoreValidationResult = Validator.validateMatchScore(score);
         	
-        	if (matchScoreValidationResult != null) {
-        		validationErrorMessage(4, matchScoreValidationResult);
+        	
+        	if (tourNameValidationResult != null) {
+        		validationErrorMessage(tourNameValidationResult);
+        	} else if (teamANameValidationResult != null) {
+        		validationErrorMessage(teamANameValidationResult);
+        	} else if (teamBNameValidationResult != null) {
+        		validationErrorMessage(teamBNameValidationResult);
+        	} else if (teamVsTeamValidationResult != null) {
+        		validationErrorMessage(teamVsTeamValidationResult);
+        	} else if (matchScoreValidationResult != null) {
+        		validationErrorMessage(matchScoreValidationResult);
         	} else if (mapNameValidationResult != null) {
-        		validationErrorMessage(5, mapNameValidationResult);
+        		validationErrorMessage( mapNameValidationResult);
         	} else {
-        		//MapDTO map = mapService.getMapByName(mapName);
         		Map map = mapService.getMapByName(mapName);
-        		//MatchDTO m = matchService.newMatch(map.getId(), score, caster);
-        		Match m = matchService.newMatch(map.getId(), score, caster);
+        		Tournament tour = tourService.getTourByName(tourName);
+        		Team teamA = teamService.getTeamByName(teamAName);
+        		Team teamB = teamService.getTeamByName(teamBName);
+        		Match m = matchService.newMatch(tour.getId(), teamA.getId(), teamB.getId(), map.getId(), score, caster);
         		System.out.println(matchService.getAllMatches());
         		saveSuccessMessage(m.getId());
         	}
@@ -202,28 +226,15 @@ public class ConsoleAppUtilities {
 	
 	//TODO dokoncit osetrovacky pre zvysne parametre
 	//line predstavuje cislo riadku v ktorom bol chybny parameter
-	private static void validationErrorMessage(int line, String errorMessage) {
+	private static void validationErrorMessage(String errorMessage) {
 		clearConsole();
 		System.out.println("\n=====================================================");
 		System.out.println("                  CHYBA VALIDÁCIE");
 		System.out.println("=====================================================\n");
 		
-		switch(line) {
-			case 1:
-				break;
-			case 2:
-				break;
-			case 3:
-				break;
-			case 4:
-				System.out.println(errorMessage);
-				System.out.println("Chyba nájdená v poli: Skóre.");
-				break;
-			case 5:
-				System.out.println(errorMessage);
-				System.out.println("Chyba nájdená v poli: Názov mapy.");
-				break;
-		}
+
+		System.out.println(errorMessage); //chybova hlaska validacie
+
 		
 		System.out.println("\nZadajte voľbu:");
 		System.out.println("[ 1 ] Opraviť chyby a skúsiť uložiť znova");
