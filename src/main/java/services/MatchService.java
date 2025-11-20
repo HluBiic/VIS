@@ -67,4 +67,16 @@ public class MatchService {
 		}
 		return result;
 	}
+	
+	public List<Match> getAllTourMatches(int id) {
+		List<Match> result = new ArrayList<>();
+		List<MatchDTO> matches = matchRepo.findAll();
+		
+		for (MatchDTO m: matches) {
+			if (m.getTournament() == id) {
+				result.add(Mapper.toDomain(m));
+			}
+		}
+		return result;
+	}
 }

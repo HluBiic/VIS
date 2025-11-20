@@ -46,5 +46,9 @@ public class TournamentService {
 	public Tournament getTourByName(String name) {
 		return Mapper.toDomain(tourRepo.findByName(name));
 	}
+	
+	public Tournament getTourById(int id) {
+		return Mapper.toDomain(tourRepo.findById(id));
+	}
 
 }

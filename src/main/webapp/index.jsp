@@ -1,3 +1,6 @@
+<%@ page import="model.Tournament" %>
+<%@ page import="java.util.List" %>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -94,22 +97,36 @@
           <tr>
             <th>ID</th>
             <th>Name</th>
-            <th>Year</th>
             <th>Location</th>
+            <th>Date</th>
           </tr>
         </thead>
         <tbody>
-          <tr onclick="selectRow(this)">
-            <td>1</td>
-            <td><a href="maps" class="text-decoration-none text-primary">
-		        Six Invitational
-		     </a></td>
-            <td>2025-10-16</td>
-            <td>Canada</td>
-          </tr>
+			<%
+				List<Tournament> tours = (List<Tournament>) request.getAttribute("tournaments");
+			    for (Tournament t : tours) {
+			%>
+			<tr>
+				<td><%= t.getId() %></td>
+				<td><a href="tourDetail?id=<%= t.getId() %>" class="text-decoration-none text-primary">
+				      <%= t.getName() %>
+				</a></td>
+				<td><%= t.getLocation() %></td>
+				<td><%= t.getDate() %></td>
+			</tr>
+			<%
+				}
+			%>
         </tbody>
       </table>
     </div>
+	<hr class="custom-line" />
+	
+	<!-- Help link text -->
+	<div class="mb-4">
+	  <a href="help" class="text-decoration-none text-primary">Help</a>
+	</div>
+    
   </div>
 
   <!-- Export Modal -->
@@ -173,15 +190,6 @@
   </div>
 
   <script>
-  document.addEventListener("DOMContentLoaded", () => {
-	  const tableRows = document.querySelectorAll("#matchesTable tbody tr");
-	  tableRows.forEach(row => {
-	    row.addEventListener("click", () => {
-	      // Redirect to MapServlet
-	      window.location.href = "maps";
-	    });
-	  });
-	});
     // Theme switching
     document.addEventListener("DOMContentLoaded", (event) => {
       const htmlElement = document.documentElement;
