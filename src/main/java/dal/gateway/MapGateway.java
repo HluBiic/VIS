@@ -13,12 +13,17 @@ import dto.AllDTOFactory;
 import dto.MapDTO;
 import lombok.extern.log4j.Log4j2;
 
-//will wrap direct work with DB and provide CRUD and return DTO objects
+/**
+ * Class which wraps a direct work with the database, provides CRUD operations
+ * and returns DTO objects.
+ */
 @Log4j2
 public class MapGateway {
 	private Connection con;
 	
-	//initialization -> creating table
+	/**
+	 * Constructor which creates a database table for Map if it doesnt exist.
+	 */
 	public MapGateway() {
 		try {
 			this.con = DBConnection.getInstance().getCon();
@@ -32,8 +37,12 @@ public class MapGateway {
 			throw new RuntimeException ("Table nitialization failed: " + e.getMessage());
 		}
 	}
-	
-	//C from CRUD
+
+	/**
+	 * Method which inserts new map into database (C - CRUD).
+	 * @param name name of the map
+	 * @return new map object which was inserted into database
+	 */
 	public MapDTO insert(String name) {
 		try (PreparedStatement ps = this.con.prepareStatement(
 				"INSERT INTO maps (name) VALUES (?)", Statement.RETURN_GENERATED_KEYS)) {
@@ -54,7 +63,11 @@ public class MapGateway {
 		return null;
 	}
 	
-	//R from CRUD
+	/**
+	 * Method which looks for existing map in the database by its id (R - CRUD).
+	 * @param id id of the map to look for
+	 * @return if the map with given id exists in database this object is returned
+	 */
 	public MapDTO findById(int id) {
 		String sql = "SELECT * from maps WHERE id = ?";
 		try (PreparedStatement ps = this.con.prepareStatement(sql)) {
@@ -73,7 +86,10 @@ public class MapGateway {
 		return null;		
 	}
 	
-	//R from CRUD
+	/**
+	 * Method which lists all existing maps in the database (R - CRUD).
+	 * @return list of all maps that exist in the database
+	 */
 	public List<MapDTO> findAll() {
 		List<MapDTO> maps = new ArrayList<MapDTO>();
 		String sql = "SELECT * FROM maps";
@@ -93,7 +109,11 @@ public class MapGateway {
 		return maps;
 	}
 	
-	//U from CRUD
+	/**
+	 * Method which updates a given map with new data in the database (U - CRUD).
+	 * @param map map object containing the new data to be updated
+	 * @return updated map object if the update was successfull
+	 */
 	public MapDTO update(MapDTO map) {
 		String sql = "UPDATE maps SET name = ? WHERE id = ?";
 		try (PreparedStatement ps = this.con.prepareStatement(sql)) {
@@ -112,7 +132,11 @@ public class MapGateway {
 		return null;
 	}
 	
-	//D from CRUD
+	/**
+	 * Method which deletes a given map from the database (D - CRUD).
+	 * @param id id of the map to delete
+	 * @return the deleted map object from the database if it exists
+	 */
 	public MapDTO delete(int id) {
 		MapDTO m = this.findById(id);
 		String sql = "DELETE FROM maps WHERE id = ?";
@@ -130,5 +154,4 @@ public class MapGateway {
 		}
 		return null;
 	}
-	
 }

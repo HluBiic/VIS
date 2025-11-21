@@ -12,6 +12,11 @@ import services.MatchService;
 import services.TeamService;
 import services.TournamentService;
 
+/**
+ * Servlet handling the "/help" path, primarily used to fetch lists of all major
+ * application entities (Maps, Matches, Tournaments, Teams) and forward them
+ * to the help.jsp view for display.
+ */
 @WebServlet("/help")
 public class HelpServlet extends HttpServlet {
 
@@ -21,7 +26,11 @@ public class HelpServlet extends HttpServlet {
 	private final TournamentService tourService = new TournamentService();
 	private final TeamService teamService = new TeamService(); 
 
-
+	/**
+	 * Handles HTTP GET requests for the help page. Fetches all entities from all 
+	 * service layers and attaches them as request attributes, then forwards the 
+	 * request to the /help.jsp page.
+	 */
 	@Override
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp) 
 			throws ServletException, IOException {

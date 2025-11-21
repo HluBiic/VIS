@@ -5,23 +5,25 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
 import dal.DBConnection;
 import dto.AllDTOFactory;
-import dto.MapDTO;
-import dto.MatchDTO;
 import dto.TournamentDTO;
 import lombok.extern.log4j.Log4j2;
 
-//will wrap direct work with DB and provide CRUD and return DTO objects
+/**
+ * Class which wraps a direct work with the database, provides CRUD operations
+ * and returns DTO objects.
+ */
 @Log4j2
 public class TournamentGateway {
 	private Connection con;
 	
-	//initialization -> creating table
+	/**
+	 * Constructor which creates a database table for Tournament if it doesnt exist.
+	 */
 	public TournamentGateway() {
 		try {
 			this.con = DBConnection.getInstance().getCon();
@@ -38,7 +40,13 @@ public class TournamentGateway {
 		}
 	}
 	
-	//C from CRUD
+	/**
+	 * Method which inserts new map into database (C - CRUD).
+	 * @param name name of the tournament
+	 * @param location location of the tournament
+	 * @param date date of the tournament
+	 * @return new tournament object which was inserted into database
+	 */
 	public TournamentDTO insert(String name, String location, String date) {
 		try (PreparedStatement ps = this.con.prepareStatement(
 				"INSERT INTO tournaments (name, location, date) VALUES (?, ?, ?)", Statement.RETURN_GENERATED_KEYS)) {
@@ -54,15 +62,17 @@ public class TournamentGateway {
 				log.info("Tournament [" + generatedID + "] - " + name + " inserted into DB.");
 				return AllDTOFactory.createTournament(generatedID, name, location, date);
 			}
-			
 		} catch (SQLException e) {
 			log.error("Insert failed: " + e.getMessage());
 		}
 		return null;
 	}
 	
-	
-	//R from CRUD
+	/**
+	 * Method which looks for existing tournament in the database by its id (R - CRUD).
+	 * @param id id of the tournament to look for
+	 * @return if the tournament with given id exists in database this object is returned
+	 */
 	public TournamentDTO findById(int id) {
 		String sql = "SELECT * from tournaments WHERE id = ?";
 		try (PreparedStatement ps = this.con.prepareStatement(sql)) {
@@ -83,8 +93,10 @@ public class TournamentGateway {
 		return null;		
 	}
 	
-	
-	//R from CRUD
+	/**
+	 * Method which lists all existing tournaments in the database (R - CRUD).
+	 * @return list of all tournaments that exist in the database
+	 */
 	public List<TournamentDTO> findAll() {
 		List<TournamentDTO> tournaments = new ArrayList<TournamentDTO>();
 		String sql = "SELECT * FROM tournaments";
@@ -106,8 +118,11 @@ public class TournamentGateway {
 		return tournaments;
 	}
 	
-	
-	//U from CRUD
+	/**
+	 * Method which updates a given tournament with new data in the database (U - CRUD).
+	 * @param t tournament object containing the new data to be updated
+	 * @return updated tournament object if the update was successfull
+	 */
 	public TournamentDTO update(TournamentDTO t) {
 		String sql = "UPDATE tournaments SET name = ?, location = ?, date = ? WHERE id = ?";
 		try (PreparedStatement ps = this.con.prepareStatement(sql)) {
@@ -128,8 +143,11 @@ public class TournamentGateway {
 		return null;
 	}
 	
-	
-	//D from CRUD
+	/**
+	 * Method which deletes a given tournament from the database (D - CRUD).
+	 * @param id id of the tournament to delete
+	 * @return the deleted tournament object from the database if it exists
+	 */
 	public TournamentDTO delete(int id) {
 		TournamentDTO t = this.findById(id);
 		String sql = "DELETE FROM tournaments WHERE id = ?";

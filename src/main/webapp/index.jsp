@@ -13,7 +13,6 @@
   />
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
   <style>
-    /* Header layout */
     .header-top {
       display: flex;
       align-items: center;
@@ -81,13 +80,6 @@
     <!-- Bottom header -->
     <div class="header-bottom mb-3">
       <div><h4>Tournaments</h4></div>
-      <button
-        class="btn btn-success"
-        data-bs-toggle="modal"
-        data-bs-target="#exportModal"
-      >
-        EXPORT
-      </button>
     </div>
 
     <!-- Matches Table -->
@@ -101,23 +93,33 @@
             <th>Date</th>
           </tr>
         </thead>
-        <tbody>
-			<%
-				List<Tournament> tours = (List<Tournament>) request.getAttribute("tournaments");
-			    for (Tournament t : tours) {
-			%>
-			<tr>
-				<td><%= t.getId() %></td>
-				<td><a href="tourDetail?id=<%= t.getId() %>" class="text-decoration-none text-primary">
-				      <%= t.getName() %>
-				</a></td>
-				<td><%= t.getLocation() %></td>
-				<td><%= t.getDate() %></td>
-			</tr>
-			<%
-				}
-			%>
-        </tbody>
+		<tbody>
+		<%
+		    List<Tournament> tours = (List<Tournament>) request.getAttribute("tournaments");
+		    if (tours == null || tours.isEmpty()) {
+		%>
+		        <tr>
+		            <td colspan="4" class="text-center text-muted">No tournaments found</td>
+		        </tr>
+		<%
+		    } else {
+		        for (Tournament t : tours) {
+		%>
+		        <tr>
+		            <td><%= t.getId() %></td>
+		            <td>
+		                <a href="tourDetail?id=<%= t.getId() %>" class="text-decoration-none text-primary">
+		                    <%= t.getName() %>
+		                </a>
+		            </td>
+		            <td><%= t.getLocation() %></td>
+		            <td><%= t.getDate() %></td>
+		        </tr>
+		<%
+		        }
+		    }
+		%>
+		</tbody>
       </table>
     </div>
 	<hr class="custom-line" />
@@ -126,67 +128,6 @@
 	<div class="mb-4">
 	  <a href="help" class="text-decoration-none text-primary">Help</a>
 	</div>
-    
-  </div>
-
-  <!-- Export Modal -->
-  <div
-    class="modal fade"
-    id="exportModal"
-    tabindex="-1"
-    aria-labelledby="exportModalLabel"
-    aria-hidden="true"
-  >
-    <div class="modal-dialog">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="exportModalLabel">
-            Download Matches
-          </h5>
-          <button
-            type="button"
-            class="btn-close"
-            data-bs-dismiss="modal"
-            aria-label="Close"
-          ></button>
-        </div>
-        <div class="modal-body">
-          <p>Please select a format</p>
-          <div class="d-flex gap-3">
-            <div class="form-check">
-              <input
-                class="form-check-input"
-                type="radio"
-                name="exportOption"
-                id="exportCSV"
-                value="exportCSV"
-              />
-              <label class="form-check-label" for="exportCSV">CSV</label>
-            </div>
-            <div class="form-check">
-              <input
-                class="form-check-input"
-                type="radio"
-                name="exportOption"
-                id="exportJSON"
-                value="exportJSON"
-              />
-              <label class="form-check-label" for="exportJSON">JSON</label>
-            </div>
-          </div>
-        </div>
-        <div class="modal-footer">
-          <button
-            type="button"
-            class="btn btn-secondary"
-            data-bs-dismiss="modal"
-          >
-            CANCEL
-          </button>
-          <button type="button" class="btn btn-success">DOWNLOAD</button>
-        </div>
-      </div>
-    </div>
   </div>
 
   <script>

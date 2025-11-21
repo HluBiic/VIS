@@ -13,12 +13,17 @@ import dto.AllDTOFactory;
 import dto.MatchDTO;
 import lombok.extern.log4j.Log4j2;
 
-//will wrap direct work with DB and provide CRUD and return DTO objects
+/**
+ * Class which wraps a direct work with the database, provides CRUD operations
+ * and returns DTO objects.
+ */
 @Log4j2
 public class MatchGateway {
 	private Connection con;
 	
-	//initialization -> creating table
+	/**
+	 * Constructor which creates a database table for Match if it doesnt exist.
+	 */
 	public MatchGateway() {
 		try {
 			this.con = DBConnection.getInstance().getCon();
@@ -37,7 +42,15 @@ public class MatchGateway {
 		}
 	}
 	
-	//C from CRUD
+	/**
+	 * Method which inserts new match into database (C - CRUD).
+	 * @param tourID id of the tournament the match was played on
+	 * @param teamAId id of the first team
+	 * @param teamBId id of the second team
+	 * @param mapID id of the map the match was played on
+	 * @param score result of the match in format A-B
+	 * @return new match object which was inserted into database
+	 */
 	public MatchDTO insert(int tourID, int teamAId, int teamBId, int mapID, String score) {
 		try (PreparedStatement ps = this.con.prepareStatement(
 				"INSERT INTO matches (tour, teamA, teamB, map, score) VALUES (?, ?, ?, ?, ?)", Statement.RETURN_GENERATED_KEYS)) {
@@ -62,7 +75,11 @@ public class MatchGateway {
 		return null;
 	}
 	
-	//R from CRUD
+	/**
+	 * Method which looks for existing match in the database by its id (R - CRUD).
+	 * @param id id of the match to look for
+	 * @return if the match with given id exists in database this object is returned
+	 */
 	public MatchDTO findById(int id) {
 		String sql = "SELECT * from matches WHERE id = ?";
 		try (PreparedStatement ps = this.con.prepareStatement(sql)) {
@@ -85,7 +102,10 @@ public class MatchGateway {
 		return null;		
 	}
 	
-	//R from CRUD
+	/**
+	 * Method which lists all existing matches in the database (R - CRUD).
+	 * @return list of all matches that exist in the database
+	 */
 	public List<MatchDTO> findAll() {
 		List<MatchDTO> matches = new ArrayList<MatchDTO>();
 		String sql = "SELECT * from matches";
@@ -109,7 +129,11 @@ public class MatchGateway {
 			return matches;
 	}
 	
-	//U from CRUD
+	/**
+	 * Method which updates a given match with new data in the database (U - CRUD).
+	 * @param match match object containing the new data to be updated
+	 * @return updated match object if the update was successfull
+	 */
 	public MatchDTO update(MatchDTO match) {
 		String sql = "UPDATE matches SET tour = ?, teamA = ?, teamB = ?, map = ?, score = ? WHERE id = ?";
 		try (PreparedStatement ps = this.con.prepareStatement(sql)) {
@@ -132,7 +156,11 @@ public class MatchGateway {
 		return null;
 	}
 	
-	//D from CRUD
+	/**
+	 * Method which deletes a given match from the database (D - CRUD).
+	 * @param id id of the match to delete
+	 * @return the deleted match object from the database if it exists
+	 */
 	public MatchDTO delete(int id) {
 		MatchDTO m = this.findById(id);
 		String sql = "DELETE FROM matches WHERE id = ?";

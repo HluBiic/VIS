@@ -11,15 +11,19 @@ import java.util.List;
 import dal.DBConnection;
 import dto.AllDTOFactory;
 import dto.TeamDTO;
-import dto.TournamentDTO;
 import lombok.extern.log4j.Log4j2;
 
-//will wrap direct work with DB and provide CRUD and return DTO objects
+/**
+ * Class which wraps a direct work with the database, provides CRUD operations
+ * and returns DTO objects.
+ */
 @Log4j2
 public class TeamGateway {
 	private Connection con;
 	
-	//initialization -> creating table
+	/**
+	 * Constructor which creates a database table for Team if it doesnt exist.
+	 */
 	public TeamGateway() {
 		try {
 			this.con = DBConnection.getInstance().getCon();
@@ -35,7 +39,12 @@ public class TeamGateway {
 		}
 	}
 	
-	//C from CRUD
+	/**
+	 * Method which inserts new team into database (C - CRUD).
+	 * @param name name of the team
+	 * @param region region of the team
+	 * @return new team object which was inserted into database
+	 */
 	public TeamDTO insert(String name, String region) {
 		try (PreparedStatement ps = this.con.prepareStatement(
 				"INSERT INTO teams (name, region) VALUES (?, ?)", Statement.RETURN_GENERATED_KEYS)) {
@@ -57,7 +66,11 @@ public class TeamGateway {
 		return null;
 	}
 	
-	//R from CRUD
+	/**
+	 * Method which looks for existing team in the database by its id (R - CRUD).
+	 * @param id id of the team to look for
+	 * @return the team with given id exists in database this object is returned
+	 */
 	public TeamDTO findById(int id) {
 		String sql = "SELECT * from teams WHERE id = ?";
 		try (PreparedStatement ps = this.con.prepareStatement(sql)) {
@@ -77,7 +90,10 @@ public class TeamGateway {
 		return null;		
 	}
 	
-	//R from CRUD
+	/**
+	 * Method which lists all existing teams in the database (R - CRUD).
+	 * @return list of all teams that exist in the database
+	 */
 	public List<TeamDTO> findAll() {
 		List<TeamDTO> teams = new ArrayList<TeamDTO>();
 		String sql = "SELECT * FROM teams";
@@ -99,7 +115,11 @@ public class TeamGateway {
 		return teams;
 	}
 	
-	//U from CRUD
+	/**
+	 * Method which updates a given team with new data in the database (U - CRUD).
+	 * @param t team object containing the new data to be updated
+	 * @return updated team object if the update was successfull
+	 */
 	public TeamDTO update(TeamDTO t) {
 		String sql = "UPDATE teams SET name = ?, region = ? WHERE id = ?";
 		try (PreparedStatement ps = this.con.prepareStatement(sql)) {
@@ -119,7 +139,11 @@ public class TeamGateway {
 		return null;
 	}
 	
-	//D from CRUD
+	/**
+	 * Method which deletes a given map from the database (D - CRUD).
+	 * @param id id of the team to delete
+	 * @return the deleted team object from the database if it exists
+	 */
 	public TeamDTO delete(int id) {
 		TeamDTO t = this.findById(id);
 		String sql = "DELETE FROM teams WHERE id = ?";

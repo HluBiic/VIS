@@ -10,14 +10,24 @@ import dto.TeamDTO;
 import mapper.Mapper;
 import model.Team;
 
+/**
+ * Provides service layer operations for managing Team entities, handling business logic
+ * and interaction with the data access layer (TeamRepository).
+ */
 public class TeamService {
 
 	private final TeamRepository teamRepo = new TeamRepository();
 	
+	/**
+	 * Initializes the database with a default set of teams if they do not already exist.
+	 */
 	public void initTeams() {
 		teamRepo.init();
 	}
 	
+	/**
+	 * Creates a new Team entity, registers it with the Unit of Work, and commits the transaction.
+	 */
 	public Team newTeam(String name, String region, String caster) {
 		UnitOfWork uow = new UnitOfWork();
 		try {
@@ -32,6 +42,9 @@ public class TeamService {
 		}
 	}
 	
+	/**
+	 * Retrieves all teams from the database and converts them into domain models.
+	 */
 	public List<Team> getAllTeams() {
 		List<Team> result = new ArrayList<>();
 		List<TeamDTO> teams = teamRepo.findAll();
@@ -41,6 +54,9 @@ public class TeamService {
 		return result;
 	}
 	
+	/**
+	 * Retrieves a single Team entity based on its name and converts it to a domain model.
+	 */
 	public Team getTeamByName(String name) {
 		return Mapper.toDomain(teamRepo.findByName(name));
 	}

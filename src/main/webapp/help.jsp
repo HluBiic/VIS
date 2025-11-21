@@ -227,7 +227,6 @@
 </div>
 
 <script>
-  // Redirect on row click
   document.addEventListener("DOMContentLoaded", () => {
     // Theme switching
     const htmlElement = document.documentElement;

@@ -1,5 +1,8 @@
 package dal;
 
+/**
+ * Enum with all the entities in the system.
+ */
 public enum EntityKind {
-	MAP, TEAM, TOURNAMENT, MATCH, CASTER, LOG_ENTRY
+	MAP, TEAM, TOURNAMENT, MATCH
 }
