@@ -13,17 +13,12 @@ import dto.AllDTOFactory;
 import dto.MapDTO;
 import lombok.extern.log4j.Log4j2;
 
-/**
- * Class which wraps a direct work with the database, provides CRUD operations
- * and returns DTO objects.
- */
+//will wrap direct work with DB and provide CRUD and return DTO objects
 @Log4j2
 public class MapGateway {
 	private Connection con;
 	
-	/**
-	 * Constructor which creates a database table for Map if it doesnt exist.
-	 */
+	//initialization -> creating table
 	public MapGateway() {
 		try {
 			this.con = DBConnection.getInstance().getCon();
@@ -32,17 +27,13 @@ public class MapGateway {
 					+ "id INT AUTO_INCREMENT PRIMARY KEY,"
 					+ "name VARCHAR(50))");
 			s.close();
-			//log.info("Map table created.");
+			log.info("Map table created.");
 		} catch (SQLException e) {
 			throw new RuntimeException ("Table nitialization failed: " + e.getMessage());
 		}
 	}
-
-	/**
-	 * Method which inserts new map into database (C - CRUD).
-	 * @param name name of the map
-	 * @return new map object which was inserted into database
-	 */
+	
+	//C from CRUD
 	public MapDTO insert(String name) {
 		try (PreparedStatement ps = this.con.prepareStatement(
 				"INSERT INTO maps (name) VALUES (?)", Statement.RETURN_GENERATED_KEYS)) {
@@ -63,11 +54,7 @@ public class MapGateway {
 		return null;
 	}
 	
-	/**
-	 * Method which looks for existing map in the database by its id (R - CRUD).
-	 * @param id id of the map to look for
-	 * @return if the map with given id exists in database this object is returned
-	 */
+	//R from CRUD
 	public MapDTO findById(int id) {
 		String sql = "SELECT * from maps WHERE id = ?";
 		try (PreparedStatement ps = this.con.prepareStatement(sql)) {
@@ -75,7 +62,7 @@ public class MapGateway {
 			
 			try (ResultSet rs = ps.executeQuery()) {
 				if (rs.next()) {
-					return AllDTOFactory.createMap(
+					return AllDTOFactory.loadMap(
 							rs.getInt("id"),
 							rs.getString("name"));
 				}
@@ -86,10 +73,7 @@ public class MapGateway {
 		return null;		
 	}
 	
-	/**
-	 * Method which lists all existing maps in the database (R - CRUD).
-	 * @return list of all maps that exist in the database
-	 */
+	//R from CRUD
 	public List<MapDTO> findAll() {
 		List<MapDTO> maps = new ArrayList<MapDTO>();
 		String sql = "SELECT * FROM maps";
@@ -98,7 +82,7 @@ public class MapGateway {
 			 ResultSet rs = s.executeQuery(sql)) {
 			
 			while (rs.next()) {
-				maps.add(AllDTOFactory.createMap(
+				maps.add(AllDTOFactory.loadMap(
 						rs.getInt("id"), 
 						rs.getString("name")
 				));
@@ -109,11 +93,7 @@ public class MapGateway {
 		return maps;
 	}
 	
-	/**
-	 * Method which updates a given map with new data in the database (U - CRUD).
-	 * @param map map object containing the new data to be updated
-	 * @return updated map object if the update was successfull
-	 */
+	//U from CRUD
 	public MapDTO update(MapDTO map) {
 		String sql = "UPDATE maps SET name = ? WHERE id = ?";
 		try (PreparedStatement ps = this.con.prepareStatement(sql)) {
@@ -124,7 +104,7 @@ public class MapGateway {
 	        
 	        if (affectedRows > 0) {
 	        	log.info("Map [" + map.getId() + "] - " + map.getName() + " updated in DB.");
-	            return AllDTOFactory.createMap(map.getId(), map.getName());
+	            return AllDTOFactory.loadMap(map.getId(), map.getName());
 	        }
 		} catch (SQLException e) {
 			log.error("Update failed: " + e.getMessage());
@@ -132,11 +112,7 @@ public class MapGateway {
 		return null;
 	}
 	
-	/**
-	 * Method which deletes a given map from the database (D - CRUD).
-	 * @param id id of the map to delete
-	 * @return the deleted map object from the database if it exists
-	 */
+	//D from CRUD
 	public MapDTO delete(int id) {
 		MapDTO m = this.findById(id);
 		String sql = "DELETE FROM maps WHERE id = ?";
@@ -147,11 +123,12 @@ public class MapGateway {
 			
 	        if (affectedRows > 0) {
 	        	log.info("Map [" + m.getId() + "] - " + m.getName() + " deleted from DB.");
-	            return AllDTOFactory.createMap(m.getId(), m.getName());
+	            return AllDTOFactory.loadMap(m.getId(), m.getName());
 	        }
 		} catch (SQLException e) {
 			log.error("Delete failed: " + e.getMessage());
 		}
 		return null;
 	}
+	
 }
